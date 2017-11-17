@@ -21,7 +21,7 @@ var COLORS = [
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
-//Document ready
+//Document function ready
 $(function () {
 
     //create socket
@@ -43,6 +43,7 @@ $(function () {
         $currentInput = $usernameInput.focus();
     });
 });
+
 
 function initChatServer(chatRoom) {
     //init socket
@@ -137,7 +138,7 @@ function initChatServer(chatRoom) {
     // el - The element to add as a message
     // options.fade - If the element should fade-in (default = true)
     // options.prepend - If the element should prepend
-    //   all other messages (default = false)
+    // all other messages (default = false)
     function addMessageElement(el, options) {
         var $el = $(el);
 
@@ -181,30 +182,6 @@ function initChatServer(chatRoom) {
         return COLORS[index];
     }
 
-    function updateTyping() {
-        if (connected) {
-            if (!typing) {
-                typing = true;
-            }
-
-            if (typing) {
-                clearTimeout(timer); //cancel the previous timer.
-                timer = null;
-                typing = false;
-
-                timer = setTimeout(function () {
-                    alert("You are being disconnected");
-                    socket.disconnect();
-                    $chatPage.fadeOut();
-                }, TYPING_TIMER_LENGTH);
-            }
-        }
-    }
-
-    $inputMessage.on('input', function () {
-        updateTyping();
-    });
-
     // Keyboard events
     $window.keydown(function (event) {
         // Auto-focus the current input when a key is typed
@@ -220,7 +197,6 @@ function initChatServer(chatRoom) {
             }
         }
     });
-
 
     // Focus input when clicking anywhere on login page
     $loginPage.click(function () {
