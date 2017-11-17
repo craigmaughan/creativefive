@@ -4,8 +4,7 @@ var router = express.Router();
 var app = express();
 var request = require('request')
 var path = require('path');
-const fs = require('fs');
-var port = process.env.PORT || 9020;
+var port = process.env.PORT || 3000;
 
 //Socket IO addon
 var http = require('http').Server(app);
@@ -27,52 +26,6 @@ var chat1_numUsers = 0;
 var chat2_numUsers = 0;
 var chat1_users = [];
 var chat2_users = [];
-
-
-//Magic Link
-app.get('/CHAT', function (req, res, next) {
-    console.log("inside /CHAT")
-    var username = req.query.name;
-    var data = req.query.line;
-    console.log("username: " + username);
-    console.log("data:" + data);
-
-    chatRoom1.emit('new message', {
-        username: username,
-        message: data
-    });
-
-    var sendBack = "<h3><strong>name=</strong> " + username + " <br><strong>line= </strong>" + data + "</h1>";
-    res.send(sendBack);
-});
-
-app.get('/public', function (req, res, next) {
-    console.log("getting file directory");
-
-    function getFiles(dir, files_) {
-        files_ = files_ || [];
-        var files = fs.readdirSync(dir);
-        for (var i in files) {
-            var name = dir + '/' + files[i];
-            if (fs.statSync(name).isDirectory()) {
-                getFiles(name, files_);
-            } else {
-                files_.push(name);
-            }
-        }
-        return files_;
-    }
-    var thosefiles = getFiles('public');
-    var output = "<ul>";
-    var thosefilelength = thosefiles.length;
-
-    for (var i = 0; i < thosefilelength; i++) {
-        var filepath = thosefiles[i].toString();
-        var ancorpath = thosefiles[i].replace(/public/, "")
-        output += "<li><a href='" + ancorpath + "'>" + ancorpath + "</a></li>";
-    }
-    res.send("<h1>File System</h1>" + output);
-});
 
 chatRoom1.on('connection', function (socket) {
     console.log("chatroom1 user is connected");
@@ -158,6 +111,7 @@ chatRoom1.on('connection', function (socket) {
         }
     });
 });
+
 
 chatRoom2.on('connection', function (socket) {
     console.log("chat room 2 user is connected");
