@@ -18,14 +18,26 @@ http.listen(port, function () {
     console.log('Server listening at port %d', port);
 });
 
-
-// Socket IO
+// Socket IO variables
 var chatRoom1 = io.of('/chatRoom1');
 var chatRoom2 = io.of('/chatRoom2');
 var chat1_numUsers = 0;
 var chat2_numUsers = 0;
 var chat1_users = [];
 var chat2_users = [];
+
+
+/*
+FOR CRAIG AND JOSH
+socket.on('string', function)                    --> This listens for things from the client
+socket.emit('string', {key: value});             --> This send to just the one socket
+socket.broadcast.emit('string', {key: value});   --> This send it to everybody
+
+
+CLIENT SIDE DOCUMENTATION FOUND CLIENT SIDE
+*/
+
+
 
 chatRoom1.on('connection', function (socket) {
     console.log("chatroom1 user is connected");
@@ -35,11 +47,12 @@ chatRoom1.on('connection', function (socket) {
     socket.on('add user', function (username) {
         console.log("add user");
 
+        //if this socket is already in use return
         if (addedUser) {
             return
         }
 
-        //username socket session for this client
+        //add socket username to array
         socket.username = username;
         chat1_users.push(username);
         ++chat1_numUsers;
@@ -56,11 +69,10 @@ chatRoom1.on('connection', function (socket) {
         });
     });
 
-    //send how users names
+    //send active users names to requesting sockets
     socket.on('get users', function (username) {
         console.log("get user");
 
-        var intro = "Chatters: ";
         var usernames = "";
         for (i = 0; i < chat1_users.length; i++) {
             usernames += chat1_users[i];
@@ -69,10 +81,10 @@ chatRoom1.on('connection', function (socket) {
                 usernames += ', ';
             }
         }
-        usernames = intro + usernames;
+        usernames = "Chatters: " + usernames;
 
         socket.emit('get users', {
-            username: usernames,
+            usernames: usernames
         });
     });
 
@@ -90,6 +102,7 @@ chatRoom1.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log("user disconnected called");
 
+        //function to find and remove user name
         function remove(arr, what) {
             var found = arr.indexOf(what);
 
@@ -102,7 +115,6 @@ chatRoom1.on('connection', function (socket) {
 
         if (addedUser) {
             --chat1_numUsers;
-
             // echo globally that this client has left
             socket.broadcast.emit('user left', {
                 username: socket.username,
@@ -125,7 +137,7 @@ chatRoom2.on('connection', function (socket) {
             return
         }
 
-        //username socket session for this client
+        //add socket username to array
         socket.username = username;
         chat2_users.push(username);
         ++chat2_numUsers;
